@@ -1,0 +1,32 @@
+{
+  "name": "stremio-filmon",
+  "displayName": "Filmon.tv",
+  "version": "1.0.0",
+  "description": "Filmon Add-on - stream live TV",
+  "main": "filmon.js",
+  "scripts": {
+    "test": "tape test/*",
+    "start": "node ./filmon.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/Ivshti/stremio-filmon"
+  },
+  "keywords": [
+    "filmon",
+    "stremio",
+    "stremio-addons"
+  ],
+  "author": "Ivo Georgiev <ivo@linvo.com> (http://ivogeorgiev.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Ivshti/stremio-filmon/issues"
+  },
+  "homepage": "https://github.com/Ivshti/stremio-filmon",
+  "dependencies": {
+    "bagpipe": "^0.3.5",
+    "lodash": "^3.10.1",
+    "needle": "^0.10.0",
+    "stremio-addons": "^1.9.1"
+  }
+}
