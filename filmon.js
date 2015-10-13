@@ -84,7 +84,8 @@ function filmonChannels(cb) {
                 posterShape: "square",
                 //banner: x.extra_big_logo || x.big_logo,
                 genre: [x.group],
-                isFree: parseInt(x.is_free) || parseInt(x.is_free_sd_mode)
+                isFree: parseInt(x.is_free) || parseInt(x.is_free_sd_mode),
+                type: "tv"
                 //certification: x.content_rating,
                 // is_free, is_free_sd_mode, type, has_tvguide, seekable,  upnp_enabled
             };
@@ -100,11 +101,19 @@ function getStream(args, callback) {
 
 }
 
+var QUERY_PROPS = ["genre", "filmon_id", "name", "type"]; // TODO: other properties?
 function getMeta(args, callback) {
-    // respect: query.type (must be tv)
-    // query.genre
-    // query.filmon_id !!
-    // query.name
+    if (! channels.all) return callback(new Error("internal error - no channels data"));
+
+    var proj, projFn;
+    if (args.projection) { proj = _.keys(args.projection); projFn = _.values(args.projection)[0] ? _.pick : _.omit }
+
+    callback(null, _.chain(channels.all).values()
+        .where(args.query || { })
+        .slice(args.skip || 0, Math.min(400, args.limit))
+        .map(function(x) { return projFn ? projFn(x, proj) : x })
+        .value());
+
     // projection
     // limit
 }
@@ -124,7 +133,7 @@ var addon = new Stremio.Server({
     },
     "meta.find": function(args, callback, user) {
         console.log("meta.find - just return results from channels.all");
-        console.log(args)
+        pipe.push(getMeta, args, callback); // push to pipe so we wait for channels to be crawled
     },
     "meta.search": function(args, callback, user) {
         console.log("meta.search - figure out a FTS index");
