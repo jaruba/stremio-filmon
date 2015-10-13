@@ -106,7 +106,13 @@ function filmonChannels(cb) {
 }
 
 function getStream(args, callback) {
-
+    if (! args.query) return callback(new Error("query must be supplied"));
+    filmon("channel/"+args.query.filmon_id, null, function(err, resp) {
+        if (err) return callback(err);
+        return callback(null, resp.streams.map(function(stream) {
+            return { availability: 2, url: stream.url, tags: [stream.quality] } 
+        }));
+    });
 }
 
 var QUERY_PROPS = ["genre", "filmon_id", "name", "type"]; // TODO: other properties?
@@ -132,12 +138,10 @@ function getMeta(args, callback) {
 
 var addon = new Stremio.Server({
     "stream.get": function(args, callback, user) {
-        console.log("stream.get - get the channel, return hls as URL");
         pipe.push(getStream, args, function(err, resp) { callback(err, resp ? (resp[0] || null) : undefined) })
     },
     "stream.find": function(args, callback, user) {
-        if (! args.query) return callback(new Error("query must be supplied"));
-        callback(null, [{ availability: channels.all[args.query.filmon_id] ? 2 : 0 }]);
+        pipe.push(getStream, args, function(err, resp) { callback(err, resp ? resp.slice(0,4) : undefined) }); 
     },
     "meta.get": function(args, callback, user) {
         // No point, we store them in string
@@ -163,10 +167,12 @@ var addon = new Stremio.Server({
     "meta.find": function(args, callback, user) {
         pipe.push(getMeta, args, callback); // push to pipe so we wait for channels to be crawled
     },
+    /*
     "meta.search": function(args, callback, user) {
         console.log("meta.search - figure out a FTS index");
         // init an FTS somehow?
     }
+    */
 }, { /* secret: mySecret */ }, manifest);
 
 var server = require("http").createServer(function (req, res) {
