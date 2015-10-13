@@ -22,16 +22,9 @@ var manifest = {
 
 var pipe = new bagpipe(1);
 var sid; // filmon session ID
-
-pipe.push(function(cb) {
-    filmon("init", { app_id: FILMON_KEY, app_secret: FILMON_SECRET }, function(err, resp) {
-        console.log(resp);
-        sid = resp.session_key;
-        // TODO: we can also get featured channels, etc.
-        // TODO: detect no sid, etc.
-        pipe.limit = FILMON_LIMIT;
-    })
-});
+var channels = { }; // all data about filmon.tv channels we have; store in memory for faster response, update periodically
+// { featured_channels: ..., groups: ..., all: ... }
+pipe.push(filmonInit);
 
 function filmon(path, args, callback) {
     needle.post(FILMON_BASE+"/"+path, args, { json: true }, function(err, resp, body) {
@@ -40,7 +33,15 @@ function filmon(path, args, callback) {
     });
 }
 
-pipe.push
+function filmonInit(cb) {
+    filmon("init", { app_id: FILMON_KEY, app_secret: FILMON_SECRET }, function(err, resp) {
+        console.log(resp);
+        sid = resp.session_key;
+        // TODO: we can also get featured channels, etc.
+        // TODO: detect no sid, etc.
+        pipe.limit = FILMON_LIMIT;
+    })
+}
 
 function getStream(args, callback) {
 
@@ -52,6 +53,15 @@ var addon = new Stremio.Server({
     },
     "stream.find": function(args, callback, user) {
         pipe.push(getStream, args, function(err, resp) { callback(err, resp ? resp.slice(0,4) : undefined) }); 
+    },
+    "meta.get": function(args, callback, user) {
+
+    },
+    "meta.find": function(args, callback, user) {
+
+    },
+    "meta.search": function(args, callback, user) {
+
     }
 }, { /* secret: mySecret */ }, manifest);
 
