@@ -134,7 +134,15 @@ var addon = new Stremio.Server({
     },
     "meta.get": function(args, callback, user) {
         console.log("meta.get - return stuff from channels.all, consider supplementing with filmon('tvguide')");
-        pipe.push(getMeta, _.extend(args, { limit: 1 }), function(err, res) { callback(err, res ? res[0] : null) });
+        pipe.push(getMeta, _.extend(args, { limit: 1 }), function(err, res) { 
+            if (err) return callback(err);
+
+            res = res ? res[0] : null;
+            if (! res) return callback(null, null);
+
+            // TODO: tvguide
+            callback(null, res);
+        });
     },
     "meta.find": function(args, callback, user) {
         pipe.push(getMeta, args, callback); // push to pipe so we wait for channels to be crawled
