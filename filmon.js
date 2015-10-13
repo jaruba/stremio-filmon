@@ -32,10 +32,12 @@ pipe.push(filmonInit);
 function filmon(path, args, callback) {
     needle.post(FILMON_BASE+"/"+path, _.extend({ session_key: sid }, args), { json: true }, function(err, resp, body) {
         // TODO: refine err handling
+        if (typeof(body) != "object") return callback(new Error("wrong response type returned"));
         callback(err, body);
     });
 }
 
+// Get session ID and featured channels
 function filmonInit(cb) {
     filmon("init", { app_id: FILMON_KEY, app_secret: FILMON_SECRET }, function(err, resp) {
         if (err) console.error(err);
@@ -52,6 +54,7 @@ function filmonInit(cb) {
     })
 }
 
+// Get all groups of channels
 function filmonGroups(cb) {
     filmon("groups", { }, function(err, resp) {
         if (! resp) return cb(); // TODO: handle the error
@@ -60,13 +63,14 @@ function filmonGroups(cb) {
     });
     setTimeout(function() { pipe.push(filmonGroups) }, 24*60*60*1000);
 }
+
+// Get all channels
 function filmonChannels(cb) {
     filmon("channels", { }, function(err, resp) {
         if (! resp) return cb(); // TODO: handle the error
         
         channels.all = _.chain(resp).map(function(x) {
             var idx = channels.featured.channels.indexOf(x.id);
-            console.log(idx != -1 ? (channels.featured.channels.length + 1 - idx) : 0)
             return {
                 filmon_id: x.id,
                 name: x.title,
@@ -134,14 +138,22 @@ var addon = new Stremio.Server({
     },
     "meta.get": function(args, callback, user) {
         console.log("meta.get - return stuff from channels.all, consider supplementing with filmon('tvguide')");
+
+        // No point, we store them in string
+        //if (args.query && args.query.filmon_id) args.query.filmon_id = parseInt(args.query.filmon_id);
+
         pipe.push(getMeta, _.extend(args, { limit: 1 }), function(err, res) { 
             if (err) return callback(err);
 
             res = res ? res[0] : null;
             if (! res) return callback(null, null);
 
-            // TODO: tvguide
-            callback(null, res);
+            if (args.projection && args.projection != "full") return callback(null, res);
+
+            filmon("tvguide/"+res.filmon_id, { }, function(err, resp) {
+                res.tvguide = resp;
+                callback(null, res);
+            });
         });
     },
     "meta.find": function(args, callback, user) {
