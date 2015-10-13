@@ -121,9 +121,10 @@ function getMeta(args, callback) {
     // full should get a tvguide
 
     callback(null, _.chain(channels.all).values()
-        .where(args.query || { })
+        .filter(args.query ? sift(args.query) : _.constant(true))
         .slice(args.skip || 0, Math.min(400, args.limit))
         .map(function(x) { return projFn ? projFn(x, proj) : x })
+        .sortBy(function(x) { return -channels.featured_channels.channels.indexOf(x.filmon_id) }) // WARNING: this is probably heavy
         .value());
 }
 
