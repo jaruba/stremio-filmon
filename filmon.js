@@ -107,7 +107,7 @@ function filmonChannels(cb) {
 
 function getStream(args, callback) {
     if (! args.query) return callback(new Error("query must be supplied"));
-    filmon("channel/"+args.query.filmon_id, null, function(err, resp) {
+    filmon("channel/"+args.query.filmon_id, { }, function(err, resp) {
         if (err) return callback(err);
         return callback(null, resp.streams.map(function(stream) {
             return { availability: 2, url: stream.url, tags: [stream.quality] } 
