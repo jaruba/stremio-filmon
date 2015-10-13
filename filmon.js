@@ -78,7 +78,7 @@ function filmonChannels(cb) {
                 name: x.title,
                 poster: x.big_logo || x.logo,
                 //logo: x.big_logo || x.logo, 
-                posterShape: "square",
+                posterShape: "square", backgroundShape: "contain", logoShape: "hidden",
                 banner: x.extra_big_logo || x.big_logo,
                 genre: [ x.group.toLowerCase().replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase() }) ],
                 isFree: parseInt(x.is_free) || parseInt(x.is_free_sd_mode),
