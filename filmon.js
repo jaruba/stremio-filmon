@@ -63,15 +63,19 @@ function filmonGroups(cb) {
 function filmonChannels(cb) {
     filmon("channels", { }, function(err, resp) {
         if (! resp) return cb(); // TODO: handle the error
+        
         channels.all = _.chain(resp).map(function(x) {
+            var idx = channels.featured.channels.indexOf(x.id);
+            console.log(idx != -1 ? (channels.featured.channels.length + 1 - idx) : 0)
             return {
                 filmon_id: x.id,
                 name: x.title,
                 poster: x.big_logo || x.logo,
                 posterShape: "square",
                 //banner: x.extra_big_logo || x.big_logo,
-                genre: [x.group.toLowerCase()],
+                genre: [ x.group.toLowerCase().replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase() }) ],
                 isFree: parseInt(x.is_free) || parseInt(x.is_free_sd_mode),
+                popularity: idx != -1 ? (channels.featured.channels.length + 1 - idx) : 0, // hehe
                 type: "tv"
                 //certification: x.content_rating,
                 // is_free, is_free_sd_mode, type, has_tvguide, seekable,  upnp_enabled
@@ -83,7 +87,11 @@ function filmonChannels(cb) {
             return true; 
         })
         .indexBy("filmon_id").value();
-        //console.log(channels.all)
+
+        channels.values = _.chain(channels.all).values()
+            .sortBy(function(x) { return -x.popularity })
+            .value();
+
         pipe.limit = FILMON_LIMIT;
         cb();
     });
@@ -107,11 +115,10 @@ function getMeta(args, callback) {
     // TODO: string projections - lean, medium and full 
     // full should get a tvguide
 
-    callback(null, _.chain(channels.all).values()
+    callback(null, _.chain(channels.values)
         .filter(args.query ? sift(args.query) : _.constant(true))
         .slice(args.skip || 0, Math.min(400, args.limit))
         .map(function(x) { return projFn ? projFn(x, proj) : x })
-        .sortBy(function(x) { return -channels.featured.channels.indexOf(x.filmon_id) }) // WARNING: this is probably heavy
         .value());
 }
 
