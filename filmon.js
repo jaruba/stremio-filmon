@@ -58,8 +58,8 @@ function filmonInit(cb) {
         sid = resp.session_key;
         channels.featured = resp.featured_channels;
 
-        pipe.push(filmonGroups);
         pipe.push(filmonChannels);
+        pipe.push(filmonGroups);
 
         cb();
     })
@@ -87,24 +87,33 @@ function getStream(args, callback) {
 }
 
 function getMeta(args, callback) {
-
+    // respect: query.type (must be tv)
+    // query.genre
+    // query.filmon_id !!
+    // query.name
+    // projection
+    // limit
 }
 
 
 var addon = new Stremio.Server({
     "stream.get": function(args, callback, user) {
+        console.log("stream.get - get the channel, return hls as URL");
         pipe.push(getStream, args, function(err, resp) { callback(err, resp ? (resp[0] || null) : undefined) })
     },
     "stream.find": function(args, callback, user) {
+        console.log("stream.find - just say anything in .all is available");
         // TODO: just reply that everything is available 
     },
     "meta.get": function(args, callback, user) {
-
+        console.log("meta.get - return stuff from channels.all, consider supplementing with filmon('tvguide')");
     },
     "meta.find": function(args, callback, user) {
-
+        console.log("meta.find - just return results from channels.all");
+        console.log(args)
     },
     "meta.search": function(args, callback, user) {
+        console.log("meta.search - figure out a FTS index");
         // init an FTS somehow?
     }
 }, { /* secret: mySecret */ }, manifest);
