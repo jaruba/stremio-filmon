@@ -106,7 +106,12 @@ function getMeta(args, callback) {
     if (! channels.all) return callback(new Error("internal error - no channels data"));
 
     var proj, projFn;
-    if (args.projection) { proj = _.keys(args.projection); projFn = _.values(args.projection)[0] ? _.pick : _.omit }
+    if (args.projection && typeof(args.projection) == "object") { 
+        proj = _.keys(args.projection);
+        projFn = _.values(args.projection)[0] ? _.pick : _.omit;
+    }
+    // TODO: string projections - lean, medium and full 
+    // full should get a tvguide
 
     callback(null, _.chain(channels.all).values()
         .where(args.query || { })
