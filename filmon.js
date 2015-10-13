@@ -23,11 +23,12 @@ var manifest = {
 var pipe = new bagpipe(1);
 var sid; // filmon session ID
 var channels = { }; // all data about filmon.tv channels we have; store in memory for faster response, update periodically
-// { featured_channels: ..., groups: ..., all: ... }
+// { featured: ..., groups: ..., all: ... }
+
 pipe.push(filmonInit);
 
 function filmon(path, args, callback) {
-    needle.post(FILMON_BASE+"/"+path, args, { json: true }, function(err, resp, body) {
+    needle.post(FILMON_BASE+"/"+path, _.extend({ session_key: sid }, args), { json: true }, function(err, resp, body) {
         // TODO: refine err handling
         callback(err, body);
     });
@@ -35,15 +36,57 @@ function filmon(path, args, callback) {
 
 function filmonInit(cb) {
     filmon("init", { app_id: FILMON_KEY, app_secret: FILMON_SECRET }, function(err, resp) {
-        console.log(resp);
+        if (err) console.error(err);
+        if (! (resp && resp.session_key)) return cb(); // TODO: handle the error
+        
         sid = resp.session_key;
-        // TODO: we can also get featured channels, etc.
-        // TODO: detect no sid, etc.
+        channels.featured = resp.featured_channels;
         pipe.limit = FILMON_LIMIT;
+
+        pipe.push(filmonGroups);
+        pipe.push(filmonChannels);
+
+        cb();
     })
 }
 
+function filmonInit(cb) {
+    filmon("init", { app_id: FILMON_KEY, app_secret: FILMON_SECRET }, function(err, resp) {
+        if (err) console.error(err);
+        if (! (resp && resp.session_key)) return cb(); // TODO: handle the error
+        
+        sid = resp.session_key;
+        channels.featured = resp.featured_channels;
+        pipe.limit = FILMON_LIMIT;
+
+        pipe.push(filmonGroups);
+        pipe.push(filmonChannels);
+
+        cb();
+    })
+}
+function filmonGroups(cb) {
+    filmon("groups", { }, function(err, resp) {
+        if (! resp) return cb(); // TODO: handle the error
+        channels.groups = _.indexBy(resp, "group");
+        cb();
+    });
+    setTimeout(function() { pipe.push(filmonGroups) }, 24*60*60*1000);
+}
+function filmonChannels(cb) {
+    filmon("channels", { }, function(err, resp) {
+        if (! resp) return cb(); // TODO: handle the error
+        channels.all = _.indexBy(resp, "id");
+        cb();
+    });
+    setTimeout(function() { pipe.push(filmonChannels) }, 12*60*60*1000);
+}
+
 function getStream(args, callback) {
+
+}
+
+function getMeta(args, callback) {
 
 }
 
@@ -52,7 +95,7 @@ var addon = new Stremio.Server({
         pipe.push(getStream, args, function(err, resp) { callback(err, resp ? (resp[0] || null) : undefined) })
     },
     "stream.find": function(args, callback, user) {
-        pipe.push(getStream, args, function(err, resp) { callback(err, resp ? resp.slice(0,4) : undefined) }); 
+        // TODO: just reply that everything is available 
     },
     "meta.get": function(args, callback, user) {
 
@@ -61,7 +104,7 @@ var addon = new Stremio.Server({
 
     },
     "meta.search": function(args, callback, user) {
-
+        // init an FTS somehow?
     }
 }, { /* secret: mySecret */ }, manifest);
 
