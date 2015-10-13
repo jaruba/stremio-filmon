@@ -2,6 +2,7 @@ var Stremio = require("stremio-addons");
 var needle = require("needle");
 var _ = require("lodash");
 var bagpipe = require("bagpipe");
+var sift = require("sift");
 
 var stremioCentral = "http://api8.herokuapp.com";
 //var mySecret = "your secret"; 
@@ -51,20 +52,6 @@ function filmonInit(cb) {
     })
 }
 
-function filmonInit(cb) {
-    filmon("init", { app_id: FILMON_KEY, app_secret: FILMON_SECRET }, function(err, resp) {
-        if (err) console.error(err);
-        if (! (resp && resp.session_key)) return cb(); // TODO: handle the error
-        
-        sid = resp.session_key;
-        channels.featured = resp.featured_channels;
-
-        pipe.push(filmonChannels);
-        pipe.push(filmonGroups);
-
-        cb();
-    })
-}
 function filmonGroups(cb) {
     filmon("groups", { }, function(err, resp) {
         if (! resp) return cb(); // TODO: handle the error
@@ -124,7 +111,7 @@ function getMeta(args, callback) {
         .filter(args.query ? sift(args.query) : _.constant(true))
         .slice(args.skip || 0, Math.min(400, args.limit))
         .map(function(x) { return projFn ? projFn(x, proj) : x })
-        .sortBy(function(x) { return -channels.featured_channels.channels.indexOf(x.filmon_id) }) // WARNING: this is probably heavy
+        .sortBy(function(x) { return -channels.featured.channels.indexOf(x.filmon_id) }) // WARNING: this is probably heavy
         .value());
 }
 
