@@ -6,8 +6,10 @@ var bagpipe = require("bagpipe");
 var stremioCentral = "http://api8.herokuapp.com";
 //var mySecret = "your secret"; 
 
-var FILMON_KEY = "";
-var FILMON_BASE = "";
+var FILMON_KEY = "foo";
+var FILMON_SECRET = "bar";
+var FILMON_BASE = "http://www.filmon.com/tv/api";
+var FILMON_LIMIT = 3; // concurrency limit
 
 var pkg = require("./package");
 var manifest = { 
@@ -17,6 +19,32 @@ var manifest = {
     name: pkg.displayName, version: pkg.version, description: pkg.description,
 };
 
+
+var pipe = new bagpipe(1);
+var sid; // filmon session ID
+
+pipe.push(function(cb) {
+    filmon("init", { app_id: FILMON_KEY, app_secret: FILMON_SECRET }, function(err, resp) {
+        console.log(resp);
+        sid = resp.session_key;
+        // TODO: we can also get featured channels, etc.
+        // TODO: detect no sid, etc.
+        pipe.limit = FILMON_LIMIT;
+    })
+});
+
+function filmon(path, args, callback) {
+    needle.post(FILMON_BASE+"/"+path, args, { json: true }, function(err, resp, body) {
+        // TODO: refine err handling
+        callback(err, body);
+    });
+}
+
+pipe.push
+
+function getStream(args, callback) {
+
+}
 
 var addon = new Stremio.Server({
     "stream.get": function(args, callback, user) {
