@@ -136,12 +136,10 @@ var addon = new Stremio.Server({
         pipe.push(getStream, args, function(err, resp) { callback(err, resp ? (resp[0] || null) : undefined) })
     },
     "stream.find": function(args, callback, user) {
-        console.log("stream.find - just say anything in .all is available");
-        // TODO: just reply that everything is available 
+        if (! args.query) return callback(new Error("query must be supplied"));
+        callback(null, [{ availability: channels.all[args.query.filmon_id] ? 2 : 0 }]);
     },
     "meta.get": function(args, callback, user) {
-        console.log("meta.get - return stuff from channels.all, consider supplementing with filmon('tvguide')");
-
         // No point, we store them in string
         //if (args.query && args.query.filmon_id) args.query.filmon_id = parseInt(args.query.filmon_id);
 
