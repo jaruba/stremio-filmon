@@ -30,11 +30,13 @@ var channels = { }; // all data about filmon.tv channels we have; store in memor
 pipe.push(filmonInit);
 
 function filmon(path, args, callback) {
-    needle.post(FILMON_BASE+"/"+path, _.extend({ session_key: sid }, args), { json: true }, function(err, resp, body) {
+    var cb = function(err, resp, body) {
         // TODO: refine err handling
-        if (typeof(body) != "object") return callback(new Error("wrong response type returned"));
+        if (typeof(body) != "object") return callback(new Error("wrong response type returned "+body));
         callback(err, body);
-    });
+    };
+    if (args === null) needle.get(FILMON_BASE+"/"+path, { json: true }, cb);
+    else needle.post(FILMON_BASE+"/"+path, _.extend({ session_key: sid }, args), { json: true }, cb);
 }
 
 // Get session ID and featured channels
@@ -150,7 +152,10 @@ var addon = new Stremio.Server({
 
             if (args.projection && args.projection != "full") return callback(null, res);
 
-            filmon("tvguide/"+res.filmon_id, { }, function(err, resp) {
+            filmon("tvguide/"+res.filmon_id, null, function(err, resp) {
+                if (err) console.error(err);
+
+                // WARNING: this object is huge
                 res.tvguide = resp;
                 callback(null, res);
             });
