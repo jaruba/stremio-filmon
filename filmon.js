@@ -16,6 +16,7 @@ var manifest = {
     "id": "org.stremio.filmon",
     "types": ["tv"],
     "filter": { "query.filmon_id": { "$exists": true }, "query.type": { "$in":["tv"] } },
+    posterShape: { tv: "square" }, 
     name: pkg.displayName, version: pkg.version, description: pkg.description,
 };
 
