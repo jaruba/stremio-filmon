@@ -57,7 +57,6 @@ function filmonInit(cb) {
         
         sid = resp.session_key;
         channels.featured = resp.featured_channels;
-        pipe.limit = FILMON_LIMIT;
 
         pipe.push(filmonGroups);
         pipe.push(filmonChannels);
@@ -77,6 +76,7 @@ function filmonChannels(cb) {
     filmon("channels", { }, function(err, resp) {
         if (! resp) return cb(); // TODO: handle the error
         channels.all = _.indexBy(resp, "id");
+        pipe.limit = FILMON_LIMIT;
         cb();
     });
     setTimeout(function() { pipe.push(filmonChannels) }, 12*60*60*1000);
@@ -89,6 +89,7 @@ function getStream(args, callback) {
 function getMeta(args, callback) {
 
 }
+
 
 var addon = new Stremio.Server({
     "stream.get": function(args, callback, user) {
