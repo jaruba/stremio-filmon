@@ -104,7 +104,7 @@ function getStream(args, callback) {
 
 var QUERY_PROPS = ["genre", "filmon_id", "name", "type"]; // TODO: other properties?
 function getMeta(args, callback) {
-    console.log(args)
+    //console.log(args)
     if (! channels.all) return callback(new Error("internal error - no channels data"));
 
     var proj, projFn;
