@@ -76,7 +76,20 @@ function filmonGroups(cb) {
 function filmonChannels(cb) {
     filmon("channels", { }, function(err, resp) {
         if (! resp) return cb(); // TODO: handle the error
-        channels.all = _.indexBy(resp, "id");
+        channels.all = _.chain(resp).map(function(x) {
+            return {
+                filmon_id: x.id,
+                name: x.title,
+                poster: x.big_logo || x.logo,
+                posterShape: "square",
+                //banner: x.extra_big_logo || x.big_logo,
+                genre: [x.group],
+                isFree: parseInt(x.is_free) || parseInt(x.is_free_sd_mode)
+                //certification: x.content_rating,
+                // is_free, is_free_sd_mode, type, has_tvguide, seekable,  upnp_enabled
+            };
+        }).indexBy("filmon_id").value();
+        //console.log(channels.all)
         pipe.limit = FILMON_LIMIT;
         cb();
     });
