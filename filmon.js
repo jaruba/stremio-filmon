@@ -28,6 +28,8 @@ var channels = { }; // all data about filmon.tv channels we have; store in memor
 // { featured: ..., groups: ..., all: ... }
 
 pipe.push(filmonInit);
+pipe.push(filmonChannels);
+pipe.push(filmonGroups);
 
 function filmon(path, args, callback) {
     var cb = function(err, resp, body) {
@@ -48,9 +50,6 @@ function filmonInit(cb) {
         sid = resp.session_key;
         channels.featured = resp.featured_channels;
 
-        pipe.push(filmonGroups);
-        pipe.push(filmonChannels);
-
         cb();
     })
 }
@@ -68,8 +67,9 @@ function filmonGroups(cb) {
 // Get all channels
 function filmonChannels(cb) {
     filmon("channels", { }, function(err, resp) {
+        if (err) console.error(err);
         if (! resp) return cb(); // TODO: handle the error
-        
+
         channels.all = _.chain(resp).map(function(x) {
             var idx = channels.featured.channels.indexOf(x.id);
             return {
@@ -98,8 +98,8 @@ function filmonChannels(cb) {
             .sortBy(function(x) { return -x.popularity })
             .value();
 
-        pipe.limit = FILMON_LIMIT;
         cb();
+        pipe.limit = FILMON_LIMIT;
     });
     setTimeout(function() { pipe.push(filmonChannels) }, 12*60*60*1000);
 }
