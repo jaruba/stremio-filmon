@@ -57,5 +57,34 @@ tape("meta.find", function(t) {
 
 
 tape("meta.get single result", function(t) {
+	addon.meta.get({ query: { filmon_id: someChannel.filmon_id } }, function(err, res) {
+		t.notOk(err, "has error");
+		t.equal(res.filmon_id, someChannel.filmon_id, "id matches");
 
+		t.ok(res.poster, "has poster");
+		t.ok(res.banner, "has banner");
+		t.ok(res.name, "has name");
+		t.ok(res.popularity, "has popularity");
+
+		t.ok(res.tvguide, "has tvguide");
+		t.ok(Array.isArray(res.tvguide), "tvguide is array");
+
+		t.end();
+	});
+});
+
+
+
+tape("stream.find", function(t) {
+	addon.stream.find({ query: { filmon_id: someChannel.filmon_id } }, function(err, res) {
+		t.notOk(err, "has error");
+
+		t.ok(res, "has res object");
+		t.ok(res.length, "has results");
+
+		t.ok(res[0].url, "has url for first result");
+		t.ok(res[0].availability, "has availability for first result");
+
+		t.end();
+	});
 });
