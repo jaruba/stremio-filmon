@@ -47,7 +47,6 @@ function filmonInit(cb) {
         
         sid = resp.session_key;
         channels.featured = resp.featured_channels;
-        pipe.limit = FILMON_LIMIT;
 
         pipe.push(filmonGroups);
         pipe.push(filmonChannels);
