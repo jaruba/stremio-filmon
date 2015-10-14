@@ -113,7 +113,7 @@ function getStream(args, callback) {
         console.log("watch-timeout: "+resp["watch-timeout"]);
 
         return callback(null, resp.streams.map(function(stream) {
-            return { availability: 2, url: stream.url, tags: [stream.quality] } 
+            return { availability: 2, url: stream.url, tag: [stream.quality, "hls"] } 
         }));
     });
 }
