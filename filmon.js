@@ -128,8 +128,6 @@ function getMeta(args, callback) {
         proj = _.keys(args.projection);
         projFn = _.values(args.projection)[0] ? _.pick : _.omit;
     }
-    // TODO: string projections - lean, medium and full 
-    // full should get a tvguide
 
     callback(null, _.chain(channels.values)
         .filter(args.query ? sift(args.query) : _.constant(true))
