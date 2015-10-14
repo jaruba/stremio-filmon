@@ -181,4 +181,6 @@ var server = require("http").createServer(function (req, res) {
 }).on("listening", function()
 {
     console.log("Filmon Stremio Addon listening on "+server.address().port);
-}).listen(process.env.PORT || 9005);
+})
+if (module.parent) module.exports = server;
+else server.listen(process.env.PORT || 9005);

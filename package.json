@@ -29,5 +29,8 @@
     "needle": "^0.10.0",
     "sift": "^2.0.9",
     "stremio-addons": "^1.9.1"
+  },
+  "devDependencies": {
+    "tape": "4.x.x"
   }
 }
