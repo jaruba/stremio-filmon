@@ -31,13 +31,13 @@ pipe.push(filmonInit);
 pipe.push(filmonChannels);
 pipe.push(filmonGroups);
 
-function filmon(path, args, callback, headers) {
+function filmon(path, args, callback) {
     var cb = function(err, resp, body) {
         // TODO: refine err handling
         if (typeof(body) != "object") return callback(new Error("wrong response type returned "+body));
         callback(err, body);
     };
-    if (args === null) needle.get(FILMON_BASE+"/"+path, { json: true, headers: headers }, cb);
+    if (args === null) needle.get(FILMON_BASE+"/"+path, { json: true }, cb);
     else needle.post(FILMON_BASE+"/"+path, _.extend({ session_key: sid }, args), { json: true }, cb);
 }
 
@@ -104,8 +104,7 @@ function filmonChannels(cb) {
     setTimeout(function() { pipe.push(filmonChannels) }, 12*60*60*1000);
 }
 
-function getStream(args, user, callback) {
-    console.log({ "x-forwarded-for": user.ip || user.remoteIp })
+function getStream(args, callback) {
     if (! args.query) return callback(new Error("query must be supplied"));
     filmon("channel/"+args.query.filmon_id, { }, function(err, resp) {
         if (err) return callback(err);
@@ -120,7 +119,7 @@ function getStream(args, user, callback) {
         //console.log(streams);
 
         callback(null, streams);
-    }, { "x-forwarded-for": user.ip || user.remoteIp });
+    });
 }
 
 var QUERY_PROPS = ["genre", "filmon_id", "name", "type"]; // TODO: other properties?
@@ -144,10 +143,10 @@ function getMeta(args, callback) {
 
 var addon = new Stremio.Server({
     "stream.get": function(args, callback, user) {
-        pipe.push(getStream, args, user, function(err, resp) { callback(err, resp ? (resp[0] || null) : undefined) })
+        pipe.push(getStream, args, function(err, resp) { callback(err, resp ? (resp[0] || null) : undefined) })
     },
     "stream.find": function(args, callback, user) {
-        pipe.push(getStream, args, user, function(err, resp) { callback(err, resp ? resp.slice(0,4) : undefined) }); 
+        pipe.push(getStream, args, function(err, resp) { callback(err, resp ? resp.slice(0,4) : undefined) }); 
     },
     "meta.get": function(args, callback, user) {
         // No point, we store them in string
