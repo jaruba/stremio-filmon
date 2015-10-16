@@ -108,12 +108,17 @@ function getStream(args, callback) {
     if (! args.query) return callback(new Error("query must be supplied"));
     filmon("channel/"+args.query.filmon_id, { }, function(err, resp) {
         if (err) return callback(err);
+        
+        var streams = _.chain(resp.streams)
+        .sortBy(function(x) { return -(x["watch-timeout"] > 2*60*60) })
+        .map(function(stream) {
+            return { availability: 2, url: stream.url, tag: [stream.quality, "hls"], timeout: stream["watch-timeout"] } 
+        })
+        .value();
 
-        console.log("watch-timeout: "+resp["watch-timeout"]);
+        //console.log(streams);
 
-        return callback(null, resp.streams.map(function(stream) {
-            return { availability: 2, url: stream.url, tag: [stream.quality, "hls"] } 
-        }));
+        callback(null, streams);
     });
 }
 
