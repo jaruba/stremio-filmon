@@ -117,7 +117,8 @@ function getStream(args, callback) {
         .value();
 
         // WARNING: streams from live53.la3.edge.filmon.com (live*.la*.edge.filmon.com ?) do not work across APIs
-        console.log(streams.map(function(x) { return x.url }));
+        // the reason is the ID, it matters on which IP it was aquired 
+        //console.log(streams.map(function(x) { return x.url }));
 
         callback(null, streams);
     });
