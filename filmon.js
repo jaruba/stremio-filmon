@@ -112,7 +112,7 @@ function getStream(args, callback) {
         var streams = _.chain(resp.streams)
         .sortBy(function(x) { return -(x["watch-timeout"] > 2*60*60) })
         .map(function(stream) {
-            return { availability: 2, url: stream.url, tag: [stream.quality, "hls"], timeout: stream["watch-timeout"] } 
+            return { availability: 2, url: stream.url, tag: [stream.quality, "hls"], timeout: stream["watch-timeout"], filmon_sid: sid } 
         })
         .value();
 
