@@ -108,12 +108,19 @@ function getStream(args, callback) {
     if (! args.query) return callback(new Error("query must be supplied"));
     filmon("channel/"+args.query.filmon_id, { }, function(err, resp) {
         if (err) return callback(err);
+        
+        var streams = _.chain(resp.streams)
+        .sortBy(function(x) { return -(x["watch-timeout"] > 2*60*60) })
+        .map(function(stream) {
+            return { availability: 2, url: stream.url, tag: [stream.quality, "hls"], timeout: stream["watch-timeout"], filmon_sid: sid, filmon_id: args.query.filmon_id } 
+        })
+        .value();
 
-        console.log("watch-timeout: "+resp["watch-timeout"]);
+        // WARNING: streams from live53.la3.edge.filmon.com (live*.la*.edge.filmon.com ?) do not work across APIs
+        // the reason is the ID, it matters on which IP it was aquired 
+        //console.log(streams.map(function(x) { return x.url }));
 
-        return callback(null, resp.streams.map(function(stream) {
-            return { availability: 2, url: stream.url, tag: [stream.quality, "hls"] } 
-        }));
+        callback(null, streams);
     });
 }
 
