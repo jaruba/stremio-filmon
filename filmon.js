@@ -88,7 +88,7 @@ function filmonChannels(cb) {
             };
         })
         .filter(function(channel) {
-            if (channel.genre[0].match(/filmon/i)) return false;
+            if (channel.genre[0] && channel.genre[0].match(/filmon/i)) return false;
             if (!channel.isFree) return false; 
             return true; 
         })
