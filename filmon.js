@@ -110,8 +110,8 @@ function getStream(args, callback) {
         if (err) return callback(err);
         
         var streams = _.chain(resp.streams)
-        //.sortBy(function(x) { return -(x["watch-timeout"] > 2*60*60) })
-	.filter(function(x) { return ["watch-timeout"] > 10*60 })
+        .sortBy(function(x) { return -(x["watch-timeout"] > 2*60*60) })
+	.slice(0, 1) // only the first streem, no need for more
         .map(function(stream) {
             return { availability: 2, url: stream.url, tag: [stream.quality, "hls"], timeout: stream["watch-timeout"], filmon_sid: sid, filmon_id: args.query.filmon_id } 
         })
