@@ -32,6 +32,8 @@ pipe.push(filmonChannels);
 pipe.push(filmonGroups);
 
 function filmon(path, args, callback) {
+    if (path != "init" && !sid) return pipe.push(filmonInit, function() { filmon(path, args, callback) });
+
     var cb = function(err, resp, body) {
         // TODO: refine err handling
         if (typeof(body) != "object") return callback(new Error("wrong response type returned "+body));
@@ -48,8 +50,9 @@ function filmonInit(cb) {
         if (! (resp && resp.session_key)) return cb(); // TODO: handle the error
         
         sid = resp.session_key;
+	setTimeout(function() { sid = null }, 1*60*60*1000);
         channels.featured = resp.featured_channels;
-
+	
         cb();
     })
 }
