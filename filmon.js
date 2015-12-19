@@ -40,8 +40,8 @@ function filmon(path, args, callback) {
         if (typeof(body) != "object") return callback(new Error("wrong response type returned "+body));
         callback(err, body);
     };
-    if (args === null) needle.get(FILMON_BASE+"/"+path, { json: true, timeout: 3000, open_timeout: 3000 }, cb);
-    else needle.post(FILMON_BASE+"/"+path, _.extend({ session_key: sid }, args), { json: true, timeout: 3000, open_timeout: 3000, }, cb);
+    if (args === null) needle.get(FILMON_BASE+"/"+path, { json: true, read_timeout: 3000, open_timeout: 3000 }, cb);
+    else needle.post(FILMON_BASE+"/"+path, _.extend({ session_key: sid }, args), { json: true, read_timeout: 3000, open_timeout: 3000, }, cb);
 }
 
 // Get session ID and featured channels
