@@ -26,13 +26,14 @@ var pipe = new bagpipe(1);
 var sid; // filmon session ID
 var channels = { }; // all data about filmon.tv channels we have; store in memory for faster response, update periodically
 // { featured: ..., groups: ..., all: ... }
+var initInPrg = false;
 
 pipe.push(filmonInit);
 pipe.push(filmonChannels);
 pipe.push(filmonGroups);
 
 function filmon(path, args, callback) {
-    if (path != "init" && !sid) { pipe.limit = 1; return pipe.push(filmonInit, function() { pipe.limit = FILMON_LIMIT; filmon(path, args, callback) }); }
+    if (path != "init" && !sid && !initInPrg) { pipe.limit = 1; return pipe.push(filmonInit, function() { pipe.limit = FILMON_LIMIT; filmon(path, args, callback) }); }
 
     var cb = function(err, resp, body) {
         // TODO: refine err handling
@@ -45,10 +46,16 @@ function filmon(path, args, callback) {
 
 // Get session ID and featured channels
 function filmonInit(cb) {
+    initInPrg = true;
     filmon("init", { app_id: FILMON_KEY, app_secret: FILMON_SECRET }, function(err, resp) {
+        initInPrg = false;
+
         if (err) console.error(err);
-        if (! (resp && resp.session_key)) return cb(); // TODO: handle the error
-        
+        if (! (resp && resp.session_key)) {
+		console.error("filmon-init: no proper session key",resp); 
+		return cb();
+        }
+
         sid = resp.session_key;
 	setTimeout(function() { sid = null }, 2*60*60*1000);
         channels.featured = resp.featured_channels;
