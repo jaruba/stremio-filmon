@@ -57,7 +57,7 @@ function filmonInit(cb) {
         }
 
         sid = resp.session_key;
-	setTimeout(function() { sid = null }, 2*60*60*1000);
+	    setTimeout(function() { sid = null }, 2*60*60*1000);
         channels.featured = resp.featured_channels;
 	
         cb();
@@ -121,7 +121,7 @@ function getStream(args, callback) {
         
         var streams = _.chain(resp.streams)
         .sortBy(function(x) { return -(x["watch-timeout"] > 2*60*60) })
-	.slice(0, 1) // only the first streem, no need for more
+        .slice(0, 1) // only the first streem, no need for more
         .map(function(stream) {
             return { availability: 2, url: stream.url, tag: [stream.quality, "hls"], timeout: stream["watch-timeout"], filmon_sid: sid, filmon_id: args.query.filmon_id } 
         })
@@ -159,7 +159,7 @@ var addon = new Stremio.Server({
         pipe.push(getStream, args, function(err, resp) { callback(err, resp ? (resp[0] || null) : undefined) })
     },
     "stream.find": function(args, callback, user) {
-        pipe.push(getStream, args, function(err, resp) { callback(err, resp ? resp.slice(0,4) : undefined) }); 
+        pipe.push(getStream, args, function(err, resp) { callback(err, resp ? resp.slice(0, 4) : undefined) }); 
     },
     "meta.get": function(args, callback, user) {
         // No point, we store them in string
