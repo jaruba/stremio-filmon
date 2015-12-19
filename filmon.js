@@ -32,7 +32,7 @@ pipe.push(filmonChannels);
 pipe.push(filmonGroups);
 
 function filmon(path, args, callback) {
-    if (path != "init" && !sid) return pipe.push(filmonInit, function() { filmon(path, args, callback) });
+    if (path != "init" && !sid) { pipe.limit = 1; return pipe.push(filmonInit, function() { pipe.limit = FILMON_LIMIT; filmon(path, args, callback) }); }
 
     var cb = function(err, resp, body) {
         // TODO: refine err handling
@@ -50,7 +50,7 @@ function filmonInit(cb) {
         if (! (resp && resp.session_key)) return cb(); // TODO: handle the error
         
         sid = resp.session_key;
-	setTimeout(function() { sid = null }, 1.5*60*60*1000);
+	setTimeout(function() { sid = null }, 2*60*60*1000);
         channels.featured = resp.featured_channels;
 	
         cb();
