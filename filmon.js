@@ -115,6 +115,8 @@ function filmonChannels(cb) {
 }
 
 function getStream(args, callback) {
+    callback = _.once(callback);
+
     if (! args.query) return callback(new Error("query must be supplied"));
     filmon("channel/"+args.query.filmon_id, { }, function(err, resp) {
         if (err) return callback(err);
@@ -133,6 +135,8 @@ function getStream(args, callback) {
 
         callback(null, streams);
     });
+
+    setTimeout(function() { callback(null) }, 10000);
 }
 
 var QUERY_PROPS = ["genre", "filmon_id", "name", "type"]; // TODO: other properties?
