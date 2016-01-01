@@ -82,6 +82,7 @@ function filmonChannels(cb) {
 
         channels.all = _.chain(resp).map(function(x) {
             var idx = channels.featured.channels.indexOf(x.id);
+            var pop = idx != -1 ? (channels.featured.channels.length + 1 - idx) : 0;
             return {
                 filmon_id: x.id,
                 name: x.title,
@@ -91,7 +92,8 @@ function filmonChannels(cb) {
                 banner: x.extra_big_logo || x.big_logo,
                 genre: [ x.group && x.group.toLowerCase().replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase() }) ],
                 isFree: parseInt(x.is_free) || parseInt(x.is_free_sd_mode),
-                popularity: idx != -1 ? (channels.featured.channels.length + 1 - idx) : 0, // hehe
+                popularity: pop, // hehe
+                popularities: {filmon: pop},
                 type: "tv"
                 //certification: x.content_rating,
                 // is_free, is_free_sd_mode, type, has_tvguide, seekable,  upnp_enabled
