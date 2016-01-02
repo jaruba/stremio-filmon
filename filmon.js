@@ -18,6 +18,7 @@ var manifest = {
     "types": ["tv"],
     "filter": { "query.filmon_id": { "$exists": true }, "query.type": { "$in":["tv"] } },
     posterShape: { tv: "square" }, 
+    repository: "http://github.com/Ivshti/stremio-filmon",
     name: pkg.displayName, version: pkg.version, description: pkg.description,
     sorts: [{prop: "popularities.filmon", name: "Filmon.tv",types:["tv"]}]
 };
