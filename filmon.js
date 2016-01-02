@@ -121,6 +121,7 @@ function getStream(args, callback) {
     callback = _.once(callback);
 
     if (! args.query) return callback(new Error("query must be supplied"));
+    if (! args.query.filmon_id) return callback(new Error("no filmon_id"));
     filmon("channel/"+args.query.filmon_id, { }, function(err, resp) {
         if (err) return callback(err);
         
