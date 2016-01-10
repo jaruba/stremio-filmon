@@ -17,6 +17,7 @@ var manifest = {
     "id": "org.stremio.filmon",
     "types": ["tv"],
     "filter": { "query.filmon_id": { "$exists": true }, "query.type": { "$in":["tv"] } },
+    icon: "http://www.strem.io/images/icon-filmon-addon.png",
     posterShape: { tv: "square" }, 
     repository: "http://github.com/Ivshti/stremio-filmon",
     endpoint: "http://filmon.strem.io/stremioget",
