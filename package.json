@@ -1,7 +1,7 @@
 {
   "name": "stremio-filmon",
   "displayName": "Filmon.tv",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Stream live TV from Filmon",
   "main": "filmon.js",
   "scripts": {
@@ -28,7 +28,7 @@
     "lodash": "^3.10.1",
     "needle": "^0.11.0",
     "sift": "^2.0.9",
-    "stremio-addons": "^1.19.0"
+    "stremio-addons": "^1.19.4"
   },
   "devDependencies": {
     "tape": "4.x.x"
