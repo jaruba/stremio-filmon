@@ -211,7 +211,7 @@ var addon = new Stremio.Server({
         search.query(args.query, function(err, res) {
             if (err) { console.error(err); return callback({ code: 2001, message: "search err" }); }
 
-            if (!res.length) return callback(null, []);
+            if (!res.length) return callback(null, { query: args.query, results: [] });
 
             // Filter results which make sense (always allow first 2)
             var max = res[0].score;
