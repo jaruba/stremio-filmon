@@ -112,7 +112,7 @@ function filmonChannels(cb) {
             if (!channel.isFree) return false; 
 
             search.add(channel.filmon_id, search.get(channel, {
-                name: { title: true, bigram: true, trigram: false, metaphone: false, boost: 2 },
+                name: { /*title: true, */ bigram: true, trigram: false, metaphone: false, boost: 2 }, // title is false to get rid of stopwords
             }));
 
             return true;
@@ -216,7 +216,7 @@ var addon = new Stremio.Server({
             // Filter results which make sense (always allow first 2)
             var max = res[0].score;
             res = res.filter(function(x, i) { return (x.score > max/2) || i<2 }); 
-            callback(null, { query: args.query, results: res.map(function(x) { return channels.all[x.id] }) });
+            callback(null, { query: args.query, results: res.map(function(x) { return channels.all[x.id] }).slice(0,6) });
         });
     }
 }, { stremioget: true, allow: ["http://api8.herokuapp.com","http://api9.strem.io"] /* secret: mySecret */ }, manifest);
