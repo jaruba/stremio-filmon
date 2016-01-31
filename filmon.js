@@ -110,11 +110,13 @@ function filmonChannels(cb) {
         .filter(function(channel) {
             if (channel.genre[0] && channel.genre[0].match(/filmon/i)) return false;
             if (!channel.isFree) return false; 
-            return true; 
+
+            search.add(channel.filmon_id, search.get(channel, {
+                name: { title: true, bigram: true, trigram: false, metaphone: false, boost: 2 },
+            }));
+
+            return true;
         })
-        /*.forEach(function(channel) {
-            search.add(x.filmon_id);
-        })*/
         .indexBy("filmon_id").value();
 
         channels.values = _.chain(channels.all).values()
@@ -203,12 +205,20 @@ var addon = new Stremio.Server({
     "meta.find": function(args, callback, user) {
         pipe.push(getMeta, args, callback); // push to pipe so we wait for channels to be crawled
     },
-    /*
     "meta.search": function(args, callback, user) {
-        console.log("meta.search - figure out a FTS index");
-        // init an FTS somehow?
+        if (typeof(args.query) != "string") return callback({ code: 2000, message: "no string query" });
+        if (args.query.length < 3) return callback(null, []);
+        search.query(args.query, function(err, res) {
+            if (err) { console.error(err); return callback({ code: 2001, message: "search err" }); }
+
+            if (!res.length) return callback(null, []);
+
+            // Filter results which make sense (always allow first 2)
+            var max = res[0].score;
+            res = res.filter(function(x, i) { return (x.score > max/2) || i<2 }); 
+            callback(null, { query: args.query, results: res.map(function(x) { return channels.all[x.id] }) });
+        });
     }
-    */
 }, { stremioget: true, allow: ["http://api8.herokuapp.com","http://api9.strem.io"] /* secret: mySecret */ }, manifest);
 
 var server = require("http").createServer(function (req, res) {
