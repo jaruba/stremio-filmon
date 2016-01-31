@@ -4,6 +4,8 @@ var _ = require("lodash");
 var bagpipe = require("bagpipe");
 var sift = require("sift");
 
+var LinvoFTS = require("linvodb-fts");
+
 var stremioCentral = "http://api8.herokuapp.com";
 //var mySecret = "your secret"; 
 
@@ -31,6 +33,7 @@ var sid; // filmon session ID
 var channels = { }; // all data about filmon.tv channels we have; store in memory for faster response, update periodically
 // { featured: ..., groups: ..., all: ... }
 var initInPrg = false;
+var search = new LinvoFTS();
 
 pipe.push(filmonInit);
 pipe.push(filmonChannels);
@@ -88,6 +91,7 @@ function filmonChannels(cb) {
             var idx = channels.featured.channels.indexOf(x.id);
             var pop = idx != -1 ? (channels.featured.channels.length + 1 - idx) : 0;
             return {
+                id: "filmon_id:"+x.id,
                 filmon_id: x.id,
                 name: x.title,
                 poster: x.big_logo || x.logo,
@@ -108,6 +112,9 @@ function filmonChannels(cb) {
             if (!channel.isFree) return false; 
             return true; 
         })
+        /*.forEach(function(channel) {
+            search.add(x.filmon_id);
+        })*/
         .indexBy("filmon_id").value();
 
         channels.values = _.chain(channels.all).values()
