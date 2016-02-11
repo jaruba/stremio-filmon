@@ -6,7 +6,7 @@ var sift = require("sift");
 
 var LinvoFTS = require("linvodb-fts");
 
-var stremioCentral = "http://api8.herokuapp.com";
+var stremioCentral = "http://api9.strem.io";
 //var mySecret = "your secret"; 
 
 var FILMON_KEY = "foo";
