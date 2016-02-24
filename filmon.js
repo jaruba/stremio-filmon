@@ -24,6 +24,7 @@ var manifest = {
     repository: "http://github.com/Ivshti/stremio-filmon",
     endpoint: "http://filmon.strem.io/stremioget/stremio/v1",
     name: pkg.displayName, version: pkg.version, description: pkg.description,
+    isFree: true,
     sorts: [{prop: "popularities.filmon", name: "Filmon.tv",types:["tv"]}]
 };
 
