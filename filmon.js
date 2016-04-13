@@ -173,7 +173,7 @@ function getMeta(args, callback) {
 
     callback(null, _.chain(channels.values)
         .filter(args.query ? sift(args.query) : _.constant(true))
-        .slice(args.skip || 0, (args.skip || 0) + Math.min(400, args.limit))
+        .slice(args.skip || 0, (args.skip || 0) + Math.min(400, args.limit || 70))
         .map(function(x) { return projFn ? projFn(x, proj) : x })
         .value());
 }
