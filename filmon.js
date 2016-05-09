@@ -169,7 +169,7 @@ function getMeta(args, callback) {
         proj = _.keys(args.projection);
         projFn = _.values(args.projection)[0] ? _.pick : _.omit;
     }
-
+    
     callback(null, _.chain(channels.values)
         .filter(args.query ? sift(args.query) : _.constant(true))
         .slice(args.skip || 0, (args.skip || 0) + Math.min(400, args.limit || 70))
