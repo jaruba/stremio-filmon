@@ -190,7 +190,7 @@ var addon = new Stremio.Server({
         pipe.push(getMeta, _.extend(args, { limit: 1 }), function(err, res) { 
             if (err) return callback(err);
 
-            res = res ? res[0] : null;
+            res = res ? _.extend({ }, res[0]) : null; // copy the object so as to attach tvguide to it
             if (! res) return callback(null, null);
 
             if (args.projection && args.projection != "full") return callback(null, res);
