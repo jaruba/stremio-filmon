@@ -91,7 +91,8 @@ function filmonChannels(cb) {
 
         channels.all = _.chain(resp).map(function(x) {
             var idx = channels.featured.channels.indexOf(x.id);
-            var pop = idx != -1 ? (channels.featured.channels.length + 1 - idx) : 0;
+            var pop = idx != -1 ? (channels.featured.channels.length + 1 - idx)+1 : 1;
+
             return {
                 id: "filmon_id:"+x.id,
                 filmon_id: x.id,
@@ -106,7 +107,8 @@ function filmonChannels(cb) {
                 popularities: {filmon: pop},
                 type: "tv"
                 //certification: x.content_rating,
-                // is_free, is_free_sd_mode, type, has_tvguide, seekable,  upnp_enabled
+                // Interesting stuff:
+                // is_free, is_free_sd_mode, type, has_tvguide, seekable, is360, upnp_enabled
             };
         })
         .filter(function(channel) {
@@ -190,7 +192,7 @@ var addon = new Stremio.Server({
         pipe.push(getMeta, _.extend(args, { limit: 1 }), function(err, res) { 
             if (err) return callback(err);
 
-            res = res ? _.extend({ }, res[0]) : null; // copy the object so as to attach tvguide to it
+            res = (res && res[0]) ? _.extend({ }, res[0]) : null; // copy the object so as to attach tvguide to it
             if (! res) return callback(null, null);
 
             if (args.projection && args.projection != "full") return callback(null, res);
