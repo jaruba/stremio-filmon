@@ -14,6 +14,10 @@ var FILMON_SECRET = "bar";
 var FILMON_BASE = "http://www.filmon.com/tv/api";
 var FILMON_LIMIT = 5; // concurrency limit
 
+var FILMON_STREMIO_FEATURED = [
+   // ids of featured TV channels in stremio
+];
+
 var pkg = require("./package");
 var manifest = { 
     "id": "org.stremio.filmon",
