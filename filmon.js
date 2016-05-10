@@ -29,7 +29,40 @@ var manifest = {
     sorts: [{prop: "popularities.filmon", name: "Filmon.tv",types:["tv"]}]
 };
 
+// Cache
+var cacheSet, cacheGet, red;
+if (process.env.REDIS) {
+    // In redis
+    console.log("Using redis caching");
 
+    var redis = require("redis");
+    red = redis.createClient(process.env.REDIS);
+    red.on("error", function(err) { console.error("redis err",err) });
+
+    cacheGet = function (domain, key, cb) { 
+        red.get(domain+":"+key, function(err, res) { 
+            if (err) return cb(err);
+            if (process.env.CACHING_LOG) console.log("cache on "+domain+":"+key+": "+(res ? "HIT" : "MISS"));
+            if (!res) return cb(null, null);
+            try { cb(null, JSON.parse(res)) } catch(e) { cb(e) }
+        }); 
+    };
+    cacheSet = function (domain, key, value, ttl) {
+        if (ttl) red.setex(domain+":"+key, ttl/1000, JSON.stringify(value), function(e){ if (e) console.error(e) });
+        else red.set(domain+":"+key, JSON.stringify(value), function(e) { if (e) console.error(e) });
+    }
+} else {
+    // In memory
+    var cache = {};
+    cacheGet = function (domain, key, cb) { cb(null, cache[domain+":"+key]) }
+    cacheSet = function(domain, key, value, ttl) 
+    {
+        cache[domain+":"+key] = value;
+        if (ttl && ttl < 2*DAY) setTimeout(function() { delete cache[domain+":"+key] }, ttl);
+    }
+}
+
+// Filmon runtime things
 var pipe = new bagpipe(1);
 var sid; // filmon session ID
 var channels = { }; // all data about filmon.tv channels we have; store in memory for faster response, update periodically
@@ -41,6 +74,7 @@ pipe.push(filmonInit);
 pipe.push(filmonChannels);
 pipe.push(filmonGroups);
 
+// Filmon API
 function filmon(path, args, callback) {
     if (path != "init" && !sid && !initInPrg) { pipe.limit = 1; return pipe.push(filmonInit, function() { pipe.limit = FILMON_LIMIT; filmon(path, args, callback) }); }
 
