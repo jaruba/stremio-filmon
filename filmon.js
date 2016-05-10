@@ -26,7 +26,7 @@ var manifest = {
     icon: "http://www.strem.io/images/icon-filmon-addon.png",
     logo: "http://www.strem.io/images/addons/filmon-logo.png",
     posterShape: { tv: "square" }, 
-    repository: "http://github.com/Ivshti/stremio-filmon",
+    repository: "http://github.com/Stremio/stremio-filmon",
     endpoint: "http://filmon.strem.io/stremioget/stremio/v1",
     name: pkg.displayName, version: pkg.version, description: pkg.description,
     isFree: true,

@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "http://github.com/Ivshti/stremio-filmon"
+    "url": "http://github.com/Stremio/stremio-filmon"
   },
   "keywords": [
     "filmon",
@@ -20,9 +20,9 @@
   "author": "Ivo Georgiev <ivo@linvo.com> (http://ivogeorgiev.com)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Ivshti/stremio-filmon/issues"
+    "url": "https://github.com/Stremio/stremio-filmon/issues"
   },
-  "homepage": "https://github.com/Ivshti/stremio-filmon",
+  "homepage": "https://github.com/Stremio/stremio-filmon",
   "dependencies": {
     "bagpipe": "Ivshti/bagpipe",
     "linvodb-fts": "git://github.com/Ivshti/linvodb-fts.git",
