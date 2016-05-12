@@ -62,7 +62,7 @@ if (process.env.REDIS) {
     cacheSet = function(domain, key, value, ttl) 
     {
         cache[domain+":"+key] = value;
-        if (ttl && ttl < 2*DAY) setTimeout(function() { delete cache[domain+":"+key] }, ttl);
+        if (ttl) setTimeout(function() { delete cache[domain+":"+key] }, ttl);
     }
 }
 
@@ -89,6 +89,17 @@ function filmon(path, args, callback) {
     };
     if (args === null) needle.get(FILMON_BASE+"/"+path, { json: true, read_timeout: 3000, open_timeout: 3000 }, cb);
     else needle.post(FILMON_BASE+"/"+path, _.extend({ session_key: sid }, args), { json: true, read_timeout: 3000, open_timeout: 3000, }, cb);
+}
+
+function filmonCached(ttl, path, callback) {
+    cacheGet("filmon", path, function(err, body) {
+        if (body) return callback(null, body);
+
+        filmon(path, { session_key: sid }, function(err, res) {
+            if (res) cacheSet("filmon", path, res, ttl);
+            callback(err, res);
+        });
+    });
 }
 
 // Get session ID and featured channels
@@ -123,7 +134,7 @@ function filmonGroups(cb) {
 
 // Get all channels
 function filmonChannels(cb) {
-    filmon("channels", { }, function(err, resp) {
+    filmonCached(6*60*60*1000, "channels", function(err, resp) {
         if (err) console.error(err);
         if (! resp) return cb(); // TODO: handle the error
 
@@ -235,7 +246,7 @@ var addon = new Stremio.Server({
 
             if (args.projection && args.projection != "full") return callback(null, res);
 
-            filmon("tvguide/"+res.filmon_id, null, function(err, resp) {
+            filmonCached(12*60*60*1000, "tvguide/"+res.filmon_id, function(err, resp) {
                 if (err) console.error(err);
 
                 // WARNING: this object is huge
