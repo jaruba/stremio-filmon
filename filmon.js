@@ -261,7 +261,7 @@ var addon = new Stremio.Server({
             callback(null, { query: args.query, results: res.map(function(x) { return channels.all[x.id] }).slice(0,6) });
         });
     }
-}, { stremioget: true, allow: ["http://api8.herokuapp.com","http://api9.strem.io"] /* secret: mySecret */ }, manifest);
+}, { stremioget: true, cacheTTL: { "meta.find": 2*60*60, "meta.get": 4*60*60 }, allow: ["http://api8.herokuapp.com","http://api9.strem.io"] /* secret: mySecret */ }, manifest);
 
 var server = require("http").createServer(function (req, res) {
     addon.middleware(req, res, function() { res.end() }); // wire the middleware - also compatible with connect / express
