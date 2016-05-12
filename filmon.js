@@ -236,7 +236,12 @@ function getMeta(args, callback) {
             next();
         }); else next();
     })(function() {
-        res = res.map(function(x) { return projFn ? projFn(x, proj) : x });
+        res = res.map(function(x) { 
+            var projected = projFn(x, proj);
+            //console.log(x.tvguide)
+            //projected.tvguide_short = x.tvguide && x.tvguide.filter();
+            return projected;
+        });
 
         callback(null, res);
     });
@@ -280,7 +285,7 @@ var addon = new Stremio.Server({
             callback(null, { query: args.query, results: res.map(function(x) { return channels.all[x.id] }).slice(0,6) });
         });
     }
-}, { stremioget: true, cacheTTL: { "meta.find": 2*60*60, "meta.get": 4*60*60 }, allow: ["http://api8.herokuapp.com","http://api9.strem.io"] /* secret: mySecret */ }, manifest);
+}, { stremioget: true, cacheTTL: { "meta.find": 30*60, "stream.find": 30*60, "meta.get": 4*60*60 }, allow: ["http://api8.herokuapp.com","http://api9.strem.io"] /* secret: mySecret */ }, manifest);
 
 var server = require("http").createServer(function (req, res) {
     addon.middleware(req, res, function() { res.end() }); // wire the middleware - also compatible with connect / express
