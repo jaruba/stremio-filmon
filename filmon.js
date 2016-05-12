@@ -217,6 +217,9 @@ function getMeta(args, callback) {
     if (args.projection && typeof(args.projection) == "object") { 
         proj = _.keys(args.projection);
         projFn = _.values(args.projection)[0] ? _.pick : _.omit;
+    } else {
+        proj = ['tvguide']
+        projFn = _.omit
     }
     
     callback(null, _.chain(channels.values)
