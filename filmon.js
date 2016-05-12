@@ -91,11 +91,11 @@ function filmon(path, args, callback) {
     else needle.post(FILMON_BASE+"/"+path, _.extend({ session_key: sid }, args), { json: true, read_timeout: 3000, open_timeout: 3000, }, cb);
 }
 
-function filmonCached(ttl, path, callback) {
+function filmonCached(ttl, path, args, callback) {
     cacheGet("filmon", path, function(err, body) {
         if (body) return callback(null, body);
 
-        filmon(path, { session_key: sid }, function(err, res) {
+        filmon(path, args, function(err, res) {
             if (res) cacheSet("filmon", path, res, ttl);
             callback(err, res);
         });
@@ -134,7 +134,7 @@ function filmonGroups(cb) {
 
 // Get all channels
 function filmonChannels(cb) {
-    filmonCached(6*60*60*1000, "channels", function(err, resp) {
+    filmonCached(6*60*60*1000, "channels", { }, function(err, resp) {
         if (err) console.error(err);
         if (! resp) return cb(); // TODO: handle the error
 
@@ -222,20 +222,24 @@ function getMeta(args, callback) {
         projFn = _.omit;
     }
 
-    /*
-    filmonCached(12*60*60*1000, "tvguide/"+res.filmon_id, function(err, resp) {
-        if (err) console.error(err);
-
-        // WARNING: this object is huge
-        res.tvguide = resp;
-    });
-    */
-
-    callback(null, _.chain(channels.values)
+    var res = _.chain(channels.values)
         .filter(args.query ? sift(args.query) : _.constant(true))
         .slice(args.skip || 0, (args.skip || 0) + Math.min(400, args.limit || 70))
-        .map(function(x) { return projFn ? projFn(x, proj) : x })
-        .value());
+        .value();
+
+    (function(next) {
+        if (res.length === 1 && !res[0].tvguide) filmonCached(12*60*60*1000, "tvguide/"+res[0].filmon_id, null, function(err, resp) {
+            if (err) console.error(err);
+
+            // WARNING: this object is huge
+            res[0].tvguide = resp;
+            next();
+        }); else next();
+    })(function() {
+        res = res.map(function(x) { return projFn ? projFn(x, proj) : x });
+
+        callback(null, res);
+    });
 }
 
 
