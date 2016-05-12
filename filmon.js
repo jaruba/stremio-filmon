@@ -184,7 +184,7 @@ function filmonChannels(cb) {
             if (channel.popularity <= 1) return;
             pipe.push(filmonCached, 12*HOUR, "tvguide/"+channel.filmon_id, null, function(err, resp) {
                 if (err) console.error(err);
-                channel.tvguide = resp;
+                channel.tvguide = resp && resp.map(mapTvGuide);
             });
         });
 
@@ -243,23 +243,36 @@ function getMeta(args, callback) {
             if (err) console.error(err);
 
             // WARNING: this object is huge
-            res[0].tvguide = resp;
+            res[0].tvguide = resp && resp.map(mapTvGuide);
             next();
         }); else next();
     })(function() {
         res = res.map(function(x) { 
             var projected = projFn(x, proj);
             projected.tvguide_short = x.tvguide && x.tvguide.filter(function(x) {
-                var starts = new Date(x.startdatetime * 1000);
-                return Math.abs( Date.now() - (starts.getTime() + 1*HOUR) ) < 6*HOUR;
+                return Math.abs( Date.now() - (new Date(x.starts).getTime() + 1*HOUR) ) < 6*HOUR;
             }).map(function(x) {
-                return _.pick(x, "isSeries", "duration", "startdatetime", "enddatetime", "programme_name")
+                return _.pick(x, "starts", "ends", "name")
             });
             return projected;
         });
 
         callback(null, res);
     });
+}
+
+function mapTvGuide(x) {
+    return { 
+        name: x.programme_name,
+        category: x.programme_category,
+        description: x.programme_description,
+        starts: new Date(x.startdatetime * 1000).getTime(),
+        enddatetime: new Date(x.startdatetime * 1000).getTime(),
+        id: x.programme,
+        season: x.seriesNumber, episode: x.episodeNumber, seriesId: x.seriesId,
+        provider: x.provider,
+        images: x.images
+    }
 }
 
 
