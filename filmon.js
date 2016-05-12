@@ -12,7 +12,7 @@ var stremioCentral = "http://api9.strem.io";
 var FILMON_KEY = "foo";
 var FILMON_SECRET = "bar";
 var FILMON_BASE = "http://www.filmon.com/tv/api";
-var FILMON_LIMIT = 5; // concurrency limit
+var FILMON_LIMIT = 8; // concurrency limit
 
 var FILMON_STREMIO_FEATURED = [
    // ids of featured TV channels in stremio
@@ -176,8 +176,17 @@ function filmonChannels(cb) {
             .sortBy(function(x) { return -x.popularity })
             .value();
 
-        cb();
         pipe.limit = FILMON_LIMIT;
+
+        channels.values.forEach(function(channel) {
+            if (channel.popularity <= 1) return;
+            pipe.push(filmonCached, 12*60*60*1000, "tvguide/"+channel.filmon_id, null, function(err, resp) {
+                if (err) console.error(err);
+                channel.tvguide = resp;
+            });
+        });
+
+        cb();
     });
     setTimeout(function() { pipe.push(filmonChannels) }, 12*60*60*1000);
 }
@@ -238,8 +247,8 @@ function getMeta(args, callback) {
     })(function() {
         res = res.map(function(x) { 
             var projected = projFn(x, proj);
-            //console.log(x.tvguide)
-            //projected.tvguide_short = x.tvguide && x.tvguide.filter();
+            console.log(x.tvguide)
+            projected.tvguide_short = x.tvguide && x.tvguide.filter();
             return projected;
         });
 
