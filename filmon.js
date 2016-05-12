@@ -18,6 +18,8 @@ var FILMON_STREMIO_FEATURED = [
    // ids of featured TV channels in stremio
 ];
 
+var HOUR = 60*60*1000;
+
 var pkg = require("./package");
 var manifest = { 
     "id": "org.stremio.filmon",
@@ -180,7 +182,7 @@ function filmonChannels(cb) {
 
         channels.values.forEach(function(channel) {
             if (channel.popularity <= 1) return;
-            pipe.push(filmonCached, 12*60*60*1000, "tvguide/"+channel.filmon_id, null, function(err, resp) {
+            pipe.push(filmonCached, 12*HOUR, "tvguide/"+channel.filmon_id, null, function(err, resp) {
                 if (err) console.error(err);
                 channel.tvguide = resp;
             });
@@ -188,7 +190,7 @@ function filmonChannels(cb) {
 
         cb();
     });
-    setTimeout(function() { pipe.push(filmonChannels) }, 12*60*60*1000);
+    setTimeout(function() { pipe.push(filmonChannels) }, 12*HOUR);
 }
 
 function getStream(args, callback) {
@@ -237,7 +239,7 @@ function getMeta(args, callback) {
         .value();
 
     (function(next) {
-        if (res.length === 1 && !res[0].tvguide) filmonCached(12*60*60*1000, "tvguide/"+res[0].filmon_id, null, function(err, resp) {
+        if (res.length === 1 && !res[0].tvguide) filmonCached(12*HOUR, "tvguide/"+res[0].filmon_id, null, function(err, resp) {
             if (err) console.error(err);
 
             // WARNING: this object is huge
@@ -247,8 +249,12 @@ function getMeta(args, callback) {
     })(function() {
         res = res.map(function(x) { 
             var projected = projFn(x, proj);
-            console.log(x.tvguide)
-            projected.tvguide_short = x.tvguide && x.tvguide.filter();
+            projected.tvguide_short = x.tvguide && x.tvguide.filter(function(x) {
+                var starts = new Date(x.startdatetime * 1000);
+                return Math.abs( Date.now() - (starts.getTime() + 1*HOUR) ) < 6*HOUR;
+            }).map(function(x) {
+                return _.pick(x, "isSeries", "duration", "startdatetime", "enddatetime", "programme_name")
+            });
             return projected;
         });
 
