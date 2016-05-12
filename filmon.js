@@ -218,8 +218,8 @@ function getMeta(args, callback) {
         proj = _.keys(args.projection);
         projFn = _.values(args.projection)[0] ? _.pick : _.omit;
     } else {
-        proj = ['tvguide']
-        projFn = _.omit
+        proj = ['tvguide'];
+        projFn = _.omit;
     }
     
     callback(null, _.chain(channels.values)
