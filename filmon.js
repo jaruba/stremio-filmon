@@ -221,7 +221,16 @@ function getMeta(args, callback) {
         proj = ['tvguide'];
         projFn = _.omit;
     }
-    
+
+    /*
+    filmonCached(12*60*60*1000, "tvguide/"+res.filmon_id, function(err, resp) {
+        if (err) console.error(err);
+
+        // WARNING: this object is huge
+        res.tvguide = resp;
+    });
+    */
+
     callback(null, _.chain(channels.values)
         .filter(args.query ? sift(args.query) : _.constant(true))
         .slice(args.skip || 0, (args.skip || 0) + Math.min(400, args.limit || 70))
@@ -244,18 +253,10 @@ var addon = new Stremio.Server({
         pipe.push(getMeta, _.extend(args, { limit: 1 }), function(err, res) { 
             if (err) return callback(err);
 
-            res = (res && res[0]) ? _.extend({ }, res[0]) : null; // copy the object so as to attach tvguide to it
+            res = res && res[0];
             if (! res) return callback(null, null);
 
-            if (args.projection && args.projection != "full") return callback(null, res);
-
-            filmonCached(12*60*60*1000, "tvguide/"+res.filmon_id, function(err, resp) {
-                if (err) console.error(err);
-
-                // WARNING: this object is huge
-                res.tvguide = resp;
-                callback(null, res);
-            });
+            callback(null, res);
         });
     },
     "meta.find": function(args, callback, user) {
