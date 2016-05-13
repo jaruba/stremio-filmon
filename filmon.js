@@ -271,7 +271,7 @@ function mapTvGuide(x) {
         id: x.programme,
         season: x.seriesNumber, episode: x.episodeNumber, seriesId: x.seriesId,
         provider: x.provider,
-        images: x.images
+       // images: x.images // super heavy, pointless for now
     }
 }
 
@@ -286,7 +286,7 @@ var addon = new Stremio.Server({
     "meta.get": function(args, callback, user) {
         // No point, we store them in string
         //if (args.query && args.query.filmon_id) args.query.filmon_id = parseInt(args.query.filmon_id);
-
+        args.projection = args.projection || { }; // full
         pipe.push(getMeta, _.extend(args, { limit: 1 }), function(err, res) { 
             if (err) return callback(err);
 
