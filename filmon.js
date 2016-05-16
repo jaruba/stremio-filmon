@@ -12,7 +12,7 @@ var stremioCentral = "http://api9.strem.io";
 var FILMON_KEY = "foo";
 var FILMON_SECRET = "bar";
 var FILMON_BASE = "http://www.filmon.com/tv/api";
-var FILMON_LIMIT = 8; // concurrency limit
+var FILMON_LIMIT = 12; // concurrency limit
 
 var FILMON_STREMIO_FEATURED = [
    // ids of featured TV channels in stremio
@@ -112,8 +112,8 @@ function filmonInit(cb) {
 
         if (err) console.error(err);
         if (! (resp && resp.session_key)) {
-        console.error("filmon-init: no proper session key",resp); 
-        return cb();
+            console.error("filmon-init: no proper session key",resp); 
+            return cb();
         }
 
         sid = resp.session_key;
@@ -131,7 +131,7 @@ function filmonGroups(cb) {
         channels.groups = _.indexBy(resp, "group");
         cb();
     });
-    setTimeout(function() { pipe.push(filmonGroups) }, 24*60*60*1000);
+    setTimeout(function() { pipe.push(filmonGroups) }, 24*HOUR);
 }
 
 // Get all channels
