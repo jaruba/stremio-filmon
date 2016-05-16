@@ -112,14 +112,14 @@ function filmonInit(cb) {
 
         if (err) console.error(err);
         if (! (resp && resp.session_key)) {
-		console.error("filmon-init: no proper session key",resp); 
-		return cb();
+        console.error("filmon-init: no proper session key",resp); 
+        return cb();
         }
 
         sid = resp.session_key;
-	    setTimeout(function() { sid = null }, 2*60*60*1000);
+        setTimeout(function() { sid = null }, 2*60*60*1000);
         channels.featured = resp.featured_channels;
-	
+    
         cb();
     })
 }
