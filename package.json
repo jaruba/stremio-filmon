@@ -28,7 +28,8 @@
     "linvodb-fts": "git://github.com/Ivshti/linvodb-fts.git",
     "lodash": "^3.10.1",
     "needle": "^0.11.0",
-    "redis": "^2.6.0-2",
+    "redis": "^2.3.0",
+    "hiredis": "^0.4.1",
     "sift": "^2.0.9",
     "stremio-addons": "^1.30.0"
   },
