@@ -267,7 +267,7 @@ function mapTvGuide(x) {
         category: x.programme_category,
         description: x.programme_description,
         starts: new Date(x.startdatetime * 1000).getTime(),
-        ends: new Date(x.startdatetime * 1000).getTime(),
+        ends: new Date(x.enddatetime * 1000).getTime(),
         id: x.programme,
         season: x.seriesNumber, episode: x.episodeNumber, seriesId: x.seriesId,
         provider: x.provider,
