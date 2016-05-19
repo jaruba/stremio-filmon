@@ -323,3 +323,6 @@ var server = require("http").createServer(function (req, res) {
 })
 if (module.parent) module.exports = server;
 else server.listen(process.env.PORT || 9005);
+
+var catchMyExceptions = require('catch-my-exceptions');
+if (process.env.SLACK_HOOK) catchMyExceptions(process.env.SLACK_HOOK, { slackUsername: "filmon" });
