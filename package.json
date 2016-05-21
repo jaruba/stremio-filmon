@@ -1,7 +1,7 @@
 {
   "name": "stremio-filmon",
   "displayName": "Filmon.tv",
-  "version": "1.6.6",
+  "version": "1.6.7",
   "description": "Stream live TV from Filmon",
   "main": "filmon.js",
   "scripts": {
