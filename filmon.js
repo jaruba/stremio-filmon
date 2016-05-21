@@ -195,6 +195,7 @@ function filmonChannels(cb) {
 
 function getStream(args, callback) {
     callback = _.once(callback);
+    setTimeout(function() { callback(new Error("internal getStream timeout")) }, 10000);
 
     if (! args.query) return callback(new Error("query must be supplied"));
     if (! args.query.filmon_id) return callback(new Error("no filmon_id"));
@@ -215,12 +216,13 @@ function getStream(args, callback) {
 
         callback(null, streams);
     });
-
-    setTimeout(function() { callback(null) }, 10000);
 }
 
 var QUERY_PROPS = ["genre", "filmon_id", "name", "type"]; // TODO: other properties?
 function getMeta(args, callback) {
+    callback = _.once(callback);
+    setTimeout(function() { callback(new Error("internal getMeta timeout")) }, 10000);
+
     //console.log(args)
     if (! channels.all) return callback(new Error("internal error - no channels data"));
 
