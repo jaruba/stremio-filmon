@@ -29,7 +29,7 @@
     "hiredis": "*",
     "linvodb-fts": "git://github.com/Ivshti/linvodb-fts.git",
     "lodash": "^3.10.1",
-    "needle": "^0.11.0",
+    "needle": "1.0.0",
     "redis": "*",
     "sift": "^2.0.9",
     "stremio-addons": "^1.30.0"
