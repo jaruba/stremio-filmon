@@ -244,7 +244,7 @@ function getMeta(args, callback) {
             if (err) console.error(err);
 
             // WARNING: this object is huge
-            res[0].tvguide = resp && resp.map(mapTvGuide);
+            res[0].tvguide = Array.isArray(resp) && resp.map(mapTvGuide);
             next();
         }); else next();
     })(function() {
