@@ -85,10 +85,11 @@ function filmon(path, args, callback) {
 
     var cb = function(err, resp, body) {
         // TODO: refine err handling
+	if (typeof(body) === "string") try { body = JSON.parse(body) } catch(e) { return callback(e) }
         if (typeof(body) != "object") return callback(new Error("wrong response type returned "+body));
         callback(err, body);
     };
-    if (args === null) needle.get(FILMON_BASE+"/"+path, { json: true, read_timeout: 3000, open_timeout: 3000 }, cb);
+    if (args === null) needle.get(FILMON_BASE+"/"+path, { json: true, read_timeout: 8000, open_timeout: 3000 }, cb);
     else needle.post(FILMON_BASE+"/"+path, _.extend({ session_key: sid }, args), { json: true, read_timeout: 3000, open_timeout: 3000, }, cb);
 }
 
@@ -109,7 +110,7 @@ function filmonInit(cb) {
     filmon("init", { app_id: FILMON_KEY, app_secret: FILMON_SECRET }, function(err, resp) {
         initInPrg = false;
 
-        if (err) console.error(err);
+        if (err) console.error("filmonInit",err);
         if (! (resp && resp.session_key)) {
             console.error("filmon-init: no proper session key",resp); 
             return cb();
@@ -136,7 +137,7 @@ function filmonGroups(cb) {
 // Get all channels
 function filmonChannels(cb) {
     filmonCached(6*60*60*1000, "channels", { }, function(err, resp) {
-        if (err) console.error(err);
+        if (err) console.error("filmonChannels", err);
         if (! resp) return cb(); // TODO: handle the error
 
         channels.all = _.chain(resp).map(function(x) {
@@ -182,7 +183,7 @@ function filmonChannels(cb) {
         channels.values.forEach(function(channel) {
             if (channel.popularity <= 1) return;
             pipe.push(filmonCached, 12*HOUR, "tvguide/"+channel.filmon_id, null, function(err, resp) {
-                if (err) console.error(err);
+                if (err) console.error("channels tvGuide", err);
                 channel.tvguide = resp && resp.map(mapTvGuide);
             });
         });
