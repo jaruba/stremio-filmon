@@ -278,9 +278,6 @@ function mapTvGuide(x) {
 
 
 var addon = new Stremio.Server({
-    "stream.get": function(args, callback, user) {
-        pipe.push(getStream, args, function(err, resp) { callback(err, resp ? (resp[0] || null) : undefined) })
-    },
     "stream.find": function(args, callback, user) {
         pipe.push(getStream, args, function(err, resp) { callback(err, resp ? resp.slice(0, 4) : undefined) }); 
     },
