@@ -136,7 +136,7 @@ function filmonGroups(cb) {
 
 // Get all channels
 function filmonChannels(cb) {
-    filmonCached(6*60*60*1000, "channels", { }, function(err, resp) {
+    filmonCached(2*60*60*1000, "channels", { }, function(err, resp) {
         if (err) console.error("filmonChannels", err);
         if (! resp) return cb(); // TODO: handle the error
 
