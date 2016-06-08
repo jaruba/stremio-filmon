@@ -94,11 +94,11 @@ function filmon(path, args, callback) {
 }
 
 function filmonCached(ttl, path, args, callback) {
-    cacheGet("filmon", path, function(err, body) {
+    cacheGet("filmon2", path, function(err, body) {
         if (body) return callback(null, body);
 
         filmon(path, args, function(err, res) {
-            if (res) cacheSet("filmon", path, res, ttl);
+            if (res) cacheSet("filmon2", path, res, ttl);
             callback(err, res);
         });
     });
