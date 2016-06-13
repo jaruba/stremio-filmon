@@ -85,7 +85,7 @@ function filmon(path, args, callback) {
 
     var cb = function(err, resp, body) {
         // TODO: refine err handling
-	if (typeof(body) === "string") try { body = JSON.parse(body) } catch(e) { return callback(e) }
+    if (typeof(body) === "string") try { body = JSON.parse(body) } catch(e) { return callback(e) }
         if (typeof(body) != "object") return callback(new Error("wrong response type returned "+body));
         callback(err, body);
     };
@@ -206,6 +206,9 @@ function getStream(args, callback) {
         .sortBy(function(x) { return -(x["watch-timeout"] > 2*60*60) })
         .slice(0, 1) // only the first streem, no need for more
         .map(function(stream) {
+            if (stream.url.startsWith('rtmp'))
+                stream.url = stream.url.replace('rtmp:', 'http:').replace('/live/','/live/' + stream.name + '/playlist.m3u8');
+
             return { availability: 2, url: stream.url, tag: [stream.quality, "hls"], timeout: stream["watch-timeout"], filmon_sid: sid, filmon_id: args.query.filmon_id } 
         })
         .value();
