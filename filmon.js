@@ -206,11 +206,16 @@ function getStream(args, callback) {
         .sortBy(function(x) { return -(x["watch-timeout"] > 2*60*60) })
         .slice(0, 1) // only the first streem, no need for more
         .map(function(stream) {
-            return { availability: 2, url: stream.url, tag: [stream.quality, "hls"], timeout: stream["watch-timeout"], filmon_sid: sid, filmon_id: args.query.filmon_id } 
+            return {
+                 availability: 2, url: stream.url, tag: [stream.quality, "hls"],
+                 timeout: stream["watch-timeout"],
+                 filmon_sid: sid, filmon_id: args.query.filmon_id,
+                 disableFilmonFallback: true, // disable hack where it re-gets .url again; TODO: set to false if matches live*.la*.edge.filmon.com
+            } 
         })
         .value();
 
-        // WARNING: streams from live53.la3.edge.filmon.com (live*.la*.edge.filmon.com ?) do not work across APIs
+        // WARNING: streams from live53.la3.edge.filmon.com (live*.la*.edge.filmon.com ?) do not work across IPs
         // the reason is the ID, it matters on which IP it was aquired 
         //console.log(streams.map(function(x) { return x.url }));
 
