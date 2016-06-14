@@ -9,8 +9,8 @@ var LinvoFTS = require("linvodb-fts");
 var stremioCentral = "http://api9.strem.io";
 //var mySecret = "your secret"; 
 
-var FILMON_KEY = "foo";
-var FILMON_SECRET = "bar";
+var FILMON_KEY = "Stremio";
+var FILMON_SECRET = process.env.FILMON_SECRET;
 var FILMON_BASE = "http://www.filmon.com/tv/api";
 var FILMON_LIMIT = 12; // concurrency limit
 
@@ -105,6 +105,8 @@ function filmonCached(ttl, path, args, callback) {
 }
 
 // Get session ID and featured channels
+FILMON_SECRET=''
+FILMON_KEY='IGlsbSBuVCJ7UDwZBl0eBR4JGgEBERhRXlBcWl0CEw=='
 function filmonInit(cb) {
     initInPrg = true;
     filmon("init", { app_id: FILMON_KEY, app_secret: FILMON_SECRET }, function(err, resp) {
