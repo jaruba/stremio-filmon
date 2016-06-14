@@ -7,7 +7,6 @@ var sift = require("sift");
 var LinvoFTS = require("linvodb-fts");
 
 var stremioCentral = "http://api9.strem.io";
-//var mySecret = "your secret"; 
 
 var FILMON_KEY = "Stremio";
 var FILMON_SECRET = process.env.FILMON_SECRET;
@@ -89,8 +88,11 @@ function filmon(path, args, callback) {
         if (typeof(body) != "object") return callback(new Error("wrong response type returned "+body));
         callback(err, body);
     };
-    if (args === null) needle.get(FILMON_BASE+"/"+path, { json: true, read_timeout: 8000, open_timeout: 3000 }, cb);
-    else needle.post(FILMON_BASE+"/"+path, _.extend({ session_key: sid }, args), { json: true, read_timeout: 3000, open_timeout: 3000, }, cb);
+
+    var fetchUrl = FILMON_BASE+"/"+path;
+    if (args) fetchUrl += '?' + _.map( sid ? _.extend({ session_key: sid }, args) : args , function(el, ij) { return ij + '=' + el; }).join('&');
+
+    needle.get(fetchUrl, { json: true, read_timeout: 8000, open_timeout: 3000 }, cb);
 }
 
 function filmonCached(ttl, path, args, callback) {
@@ -105,8 +107,6 @@ function filmonCached(ttl, path, args, callback) {
 }
 
 // Get session ID and featured channels
-FILMON_SECRET=''
-FILMON_KEY='IGlsbSBuVCJ7UDwZBl0eBR4JGgEBERhRXlBcWl0CEw=='
 function filmonInit(cb) {
     initInPrg = true;
     filmon("init", { app_id: FILMON_KEY, app_secret: FILMON_SECRET }, function(err, resp) {
@@ -233,7 +233,6 @@ function getMeta(args, callback) {
     callback = _.once(callback);
     setTimeout(function() { callback(new Error("internal getMeta timeout")) }, 10000);
 
-    //console.log(args)
     if (! channels.all) return callback(new Error("internal error - no channels data"));
 
     var proj, projFn;
