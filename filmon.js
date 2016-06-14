@@ -7,7 +7,6 @@ var sift = require("sift");
 var LinvoFTS = require("linvodb-fts");
 
 var stremioCentral = "http://api9.strem.io";
-//var mySecret = "your secret"; 
 
 var FILMON_KEY = "Stremio";
 var FILMON_SECRET = process.env.FILMON_SECRET;
@@ -105,8 +104,6 @@ function filmonCached(ttl, path, args, callback) {
 }
 
 // Get session ID and featured channels
-FILMON_SECRET=''
-FILMON_KEY='IGlsbSBuVCJ7UDwZBl0eBR4JGgEBERhRXlBcWl0CEw=='
 function filmonInit(cb) {
     initInPrg = true;
     filmon("init", { app_id: FILMON_KEY, app_secret: FILMON_SECRET }, function(err, resp) {
