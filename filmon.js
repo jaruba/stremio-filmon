@@ -21,9 +21,13 @@ var HOUR = 60*60*1000;
 
 var pkg = require("./package");
 var manifest = { 
-    "id": "org.stremio.filmon",
-    "types": ["tv"],
-    "filter": { "query.filmon_id": { "$exists": true }, "query.type": { "$in":["tv"] } },
+    id: "org.stremio.filmon",
+
+    idProperty: "filmon_id",
+    types: ["tv"],
+    // OBSOLETE; equivalent of idProperty/types in pre-4.0 stremio
+    filter: { "query.filmon_id": { "$exists": true }, "query.type": { "$in":["tv"] } },
+
     icon: "http://www.strem.io/images/icon-filmon-addon.png",
     logo: "http://www.strem.io/images/addons/filmon-logo.png",
     repository: "http://github.com/Stremio/stremio-filmon",
