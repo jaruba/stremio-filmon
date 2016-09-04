@@ -10,8 +10,10 @@ var someChannel;
 
 tape("listening on port", function(t) {
 	t.timeoutAfter(500);
-
-	var server = require("../filmon").listen(PORT).on("listening", function() {
+	var server = require("http").createServer(function (req, res) {
+		require("../filmon").middleware(req, res, function() { res.end() }); // wire the middleware - also compatible with connect / express
+	});
+	server.listen(PORT).on("listening", function() {
 		t.ok(PORT == server.address().port, "server is listening on port")
 		t.end();
 	})
@@ -21,14 +23,12 @@ tape("initializes properly", function(t) {
 	t.timeoutAfter(1000);
 
 	addon = new Stremio.Client();
-	addon.setAuth("http://api8.herokuapp.com", "423f59935153f2f5d2db0f6c9b812592b61b3737"); // cinema token
 	addon.add("http://localhost:"+PORT);
 	addon.on("addon-ready", function(service) {
 		t.ok(service.manifest, "has manifest");
 		t.ok(service.manifest.name, "has name");
 		t.ok(service.manifest.methods && service.manifest.methods.length, "has methods");
 		t.ok(service.manifest.methods && service.manifest.methods.indexOf("stream.find")!=-1, "has stream.find method");
-		t.ok(service.manifest.methods && service.manifest.methods.indexOf("stream.get")!=-1, "has stream.get method");
 		t.ok(service.manifest.methods && service.manifest.methods.indexOf("meta.find")!=-1, "has meta.find method");
 		t.ok(service.manifest.methods && service.manifest.methods.indexOf("meta.get")!=-1, "has meta.get method");
 		t.end();
