@@ -39,34 +39,46 @@ var manifest = {
 
 // Cache
 var cacheSet, cacheGet, red;
+
+function cleanKey(key) {
+    if (key.indexOf('/api/vod/') > -1) key = key.substr(key.indexOf('/api/vod/') + 9)
+    if (key.indexOf('/api/') > -1) key = key.substr(key.indexOf('/api/') + 5)
+    if (key.indexOf('session_key=') > -1) {
+        var matcher = key.match(/session_key=[^&]*/g)
+        if (key.indexOf(matcher + '&') > -1) key = key.replace(matcher + '&', '')
+        else key = key.replace(matcher, '')
+    }
+    return key
+}
+
 if (process.env.REDIS) {
     // In redis
     console.log("Using redis caching");
 
-    var redis = require("redis");
+   var redis = require("redis");
     red = redis.createClient(process.env.REDIS);
     red.on("error", function(err) { console.error("redis err",err) });
 
     cacheGet = function (domain, key, cb) { 
-        red.get(domain+":"+key, function(err, res) { 
+        red.get(domain+":"+cleanKey(key), function(err, res) { 
             if (err) return cb(err);
-            if (process.env.CACHING_LOG) console.log("cache on "+domain+":"+key+": "+(res ? "HIT" : "MISS"));
+            if (process.env.CACHING_LOG) console.log("cache on "+domain+":"+cleanKey(key)+": "+(res ? "HIT" : "MISS"));
             if (!res) return cb(null, null);
             try { cb(null, JSON.parse(res)) } catch(e) { cb(e) }
-        }); 
+        });
     };
     cacheSet = function (domain, key, value, ttl) {
-        if (ttl) red.setex(domain+":"+key, ttl/1000, JSON.stringify(value), function(e){ if (e) console.error(e) });
-        else red.set(domain+":"+key, JSON.stringify(value), function(e) { if (e) console.error(e) });
+        if (ttl) red.setex(domain+":"+cleanKey(key), ttl/1000, JSON.stringify(value), function(e){ if (e) console.error(e) });
+        else red.set(domain+":"+cleanKey(key), JSON.stringify(value), function(e) { if (e) console.error(e) });
     }
 } else {
     // In memory
     var cache = {};
-    cacheGet = function (domain, key, cb) { cb(null, cache[domain+":"+key]) }
+    cacheGet = function (domain, key, cb) { cb(null, cache[domain+":"+cleanKey(key)]) }
     cacheSet = function(domain, key, value, ttl) 
     {
-        cache[domain+":"+key] = value;
-        if (ttl) setTimeout(function() { delete cache[domain+":"+key] }, ttl);
+        cache[domain+":"+cleanKey(key)] = value;
+        if (ttl) setTimeout(function() { delete cache[domain+":"+cleanKey(key)] }, ttl);
     }
 }
 
