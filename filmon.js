@@ -41,8 +41,6 @@ var manifest = {
 var cacheSet, cacheGet, red;
 
 function cleanKey(key) {
-    if (key.indexOf('/api/vod/') > -1) key = key.substr(key.indexOf('/api/vod/') + 9)
-    if (key.indexOf('/api/') > -1) key = key.substr(key.indexOf('/api/') + 5)
     if (key.indexOf('session_key=') > -1) {
         var matcher = key.match(/session_key=[^&]*/g)
         if (key.indexOf(matcher + '&') > -1) key = key.replace(matcher + '&', '')
